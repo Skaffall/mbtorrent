@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build Windows release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+          cache: true
+
+      - name: Test
+        run: CGO_ENABLED=0 go test ./...
+
+      - name: Build
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          if [ "$version" = "main" ] || [ -z "$version" ]; then
+            version="0.1.0"
+          fi
+          mkdir -p dist
+          for arch in amd64 arm64; do
+            echo "→ windows/$arch"
+            CGO_ENABLED=0 GOOS=windows GOARCH="$arch" \
+              go build -trimpath -buildvcs=false \
+              -ldflags "-s -w -H=windowsgui -X mbtorrent/internal/buildinfo.Version=$version" \
+              -o "dist/mbtorrent-$arch.exe" .
+          done
+          cp -f dist/mbtorrent-amd64.exe dist/mbtorrent.exe
+          ls -lh dist/*.exe
+
+      - name: Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/mbtorrent.exe
+            dist/mbtorrent-amd64.exe
+            dist/mbtorrent-arm64.exe
+          generate_release_notes: true
+          fail_on_unmatched_files: true
