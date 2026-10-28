@@ -1,5 +1,5 @@
 # mbtorrent
-# tgc:@mbtorrentskaffall
+tgc:@mbtorrentskaffall
 **Неофициальный форк qBittorrent для Windows: один `.exe`, без Qt, без установщика, без зависимостей.**
 
 [![Release](https://img.shields.io/github/v/release/Skaffall/mbtorrent?color=2f81f7&label=release)](https://github.com/Skaffall/mbtorrent/releases/latest)
