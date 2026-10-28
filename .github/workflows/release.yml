@@ -40,7 +40,9 @@ jobs:
               -o "dist/mbtorrent-$arch.exe" .
           done
           cp -f dist/mbtorrent-amd64.exe dist/mbtorrent.exe
+          (cd dist && sha256sum mbtorrent.exe mbtorrent-amd64.exe mbtorrent-arm64.exe > SHA256SUMS.txt)
           ls -lh dist/*.exe
+          cat dist/SHA256SUMS.txt
 
       - name: Publish
         uses: softprops/action-gh-release@v2
@@ -49,5 +51,6 @@ jobs:
             dist/mbtorrent.exe
             dist/mbtorrent-amd64.exe
             dist/mbtorrent-arm64.exe
+            dist/SHA256SUMS.txt
           generate_release_notes: true
           fail_on_unmatched_files: true
